@@ -14,8 +14,8 @@ import java.util.Optional;
 public class EnchantmentUtil {
 
     public static int getLevel(RegistryKey<Enchantment> key, ItemStack stack, DynamicRegistryManager registryManager) {
-        Registry<Enchantment> registry = registryManager.get(RegistryKeys.ENCHANTMENT);
-        Optional<RegistryEntry.Reference<Enchantment>> entry = registry.getEntry(key);
+        Registry<Enchantment> registry = registryManager.getOrThrow(RegistryKeys.ENCHANTMENT);
+        Optional<RegistryEntry.Reference<Enchantment>> entry = registry.getEntry(key.getValue());
         return entry.map(e -> EnchantmentHelper.getLevel(e, stack)).orElse(0);
     }
 

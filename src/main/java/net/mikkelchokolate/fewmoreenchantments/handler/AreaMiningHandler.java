@@ -2,7 +2,6 @@ package net.mikkelchokolate.fewmoreenchantments.handler;
 
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.minecraft.block.BlockState;
-import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
@@ -13,6 +12,7 @@ import net.mikkelchokolate.fewmoreenchantments.EnchantmentUtil;
 import net.mikkelchokolate.fewmoreenchantments.ModEnchantments;
 
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 public class AreaMiningHandler {
@@ -26,11 +26,12 @@ public class AreaMiningHandler {
             if (PROCESSING.contains(pos)) return;
 
             ItemStack tool = player.getMainHandStack();
-            int radius = getAreaRadius(tool, world);
-            if (radius <= 0) return;
+            int areaRadius = getAreaRadius(tool, world);
+            if (areaRadius <= 0) return;
 
             Direction facing = getMinedFace(serverPlayer);
-            Set<BlockPos> toBreak = getAreaPositions(pos, facing, radius);
+            int depth = getDepth(tool, world);
+            Set<BlockPos> toBreak = getAreaPositions(pos, facing, areaRadius, depth);
 
             for (BlockPos targetPos : toBreak) {
                 if (tool.isEmpty()) break;
@@ -38,8 +39,7 @@ public class AreaMiningHandler {
                 BlockState targetState = world.getBlockState(targetPos);
                 if (!targetState.isAir() && targetState.getHardness(world, targetPos) >= 0
                         && tool.isSuitableFor(targetState)) {
-                    world.breakBlock(targetPos, true, player);
-                    tool.damage(1, serverPlayer, EquipmentSlot.MAINHAND);
+                    serverPlayer.interactionManager.tryBreakBlock(targetPos);
                 }
                 PROCESSING.remove(targetPos);
             }
@@ -49,6 +49,10 @@ public class AreaMiningHandler {
     private static int getAreaRadius(ItemStack tool, World world) {
         int level = EnchantmentUtil.getLevel(ModEnchantments.AREA_MINING, tool, world.getRegistryManager());
         return level;
+    }
+
+    private static int getDepth(ItemStack tool, World world) {
+        return EnchantmentUtil.getLevel(ModEnchantments.DEPTH_MINE, tool, world.getRegistryManager());
     }
 
     private static Direction getMinedFace(ServerPlayerEntity player) {
@@ -66,8 +70,8 @@ public class AreaMiningHandler {
         }
     }
 
-    private static Set<BlockPos> getAreaPositions(BlockPos center, Direction facing, int radius) {
-        Set<BlockPos> positions = new HashSet<>();
+    private static Set<BlockPos> getAreaPositions(BlockPos center, Direction facing, int radius, int depth) {
+        Set<BlockPos> positions = new LinkedHashSet<>();
 
         Direction axis1;
         Direction axis2;
@@ -88,13 +92,19 @@ public class AreaMiningHandler {
                 break;
         }
 
-        for (int i = -radius; i <= radius; i++) {
-            for (int j = -radius; j <= radius; j++) {
-                if (i == 0 && j == 0) continue;
-                BlockPos offset = center
-                        .offset(axis1, i)
-                        .offset(axis2, j);
-                positions.add(offset);
+        int verticalShift = facing.getAxis() == Direction.Axis.Y ? 0 : Math.max(radius - 1, 0);
+
+        for (int layer = 0; layer <= depth; layer++) {
+            BlockPos layerCenter = center.offset(facing, layer).up(verticalShift);
+
+            for (int i = -radius; i <= radius; i++) {
+                for (int j = -radius; j <= radius; j++) {
+                    BlockPos offset = layerCenter
+                            .offset(axis1, i)
+                            .offset(axis2, j);
+                    if (offset.equals(center)) continue;
+                    positions.add(offset);
+                }
             }
         }
 

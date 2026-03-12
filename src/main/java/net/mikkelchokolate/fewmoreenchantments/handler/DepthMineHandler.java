@@ -2,7 +2,6 @@ package net.mikkelchokolate.fewmoreenchantments.handler;
 
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.minecraft.block.BlockState;
-import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
@@ -26,6 +25,9 @@ public class DepthMineHandler {
             if (PROCESSING.contains(pos)) return;
 
             ItemStack tool = player.getMainHandStack();
+            int areaLevel = EnchantmentUtil.getLevel(ModEnchantments.AREA_MINING, tool, world.getRegistryManager());
+            if (areaLevel > 0) return;
+
             int level = EnchantmentUtil.getLevel(ModEnchantments.DEPTH_MINE, tool, world.getRegistryManager());
             if (level <= 0) return;
 
@@ -40,8 +42,7 @@ public class DepthMineHandler {
                 BlockState targetState = world.getBlockState(targetPos);
                 if (!targetState.isAir() && targetState.getHardness(world, targetPos) >= 0
                         && tool.isSuitableFor(targetState)) {
-                    world.breakBlock(targetPos, true, player);
-                    tool.damage(1, serverPlayer, EquipmentSlot.MAINHAND);
+                    serverPlayer.interactionManager.tryBreakBlock(targetPos);
                 }
                 PROCESSING.remove(targetPos);
             }

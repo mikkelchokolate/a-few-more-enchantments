@@ -1,6 +1,7 @@
 package net.mikkelchokolate.fewmoreenchantments.handler;
 
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -27,11 +28,16 @@ public class MagnetismHandler {
         });
     }
 
+    private static final EquipmentSlot[] ARMOR_SLOTS = {
+            EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET
+    };
+
     private static int getMagnetismLevel(ServerPlayerEntity player) {
         int maxLevel = 0;
-        for (ItemStack armorStack : player.getArmorItems()) {
+        for (EquipmentSlot slot : ARMOR_SLOTS) {
+            ItemStack armorStack = player.getEquippedStack(slot);
             if (armorStack.isEmpty()) continue;
-            int level = EnchantmentUtil.getLevel(ModEnchantments.MAGNETISM, armorStack, player.getWorld().getRegistryManager());
+            int level = EnchantmentUtil.getLevel(ModEnchantments.MAGNETISM, armorStack, player.getRegistryManager());
             if (level > maxLevel) {
                 maxLevel = level;
             }
@@ -45,19 +51,19 @@ public class MagnetismHandler {
                 player.getX() + radius, player.getY() + radius, player.getZ() + radius
         );
 
-        List<ItemEntity> items = player.getWorld().getEntitiesByClass(ItemEntity.class, box, item -> {
+        List<ItemEntity> items = player.getEntityWorld().getEntitiesByClass(ItemEntity.class, box, item -> {
             if (item.isRemoved()) return false;
             if (item.cannotPickup()) return false;
             return item.squaredDistanceTo(player) <= radius * radius;
         });
 
-        Vec3d playerPos = player.getPos().add(0, 0.5, 0);
+        Vec3d playerPos = new Vec3d(player.getX(), player.getY() + 0.5, player.getZ());
 
         for (ItemEntity item : items) {
-            Vec3d direction = playerPos.subtract(item.getPos()).normalize();
+            Vec3d direction = playerPos.subtract(new Vec3d(item.getX(), item.getY(), item.getZ())).normalize();
             double speed = 0.3;
             item.setVelocity(direction.multiply(speed));
-            item.velocityModified = true;
+            item.velocityDirty = true;
         }
     }
 }

@@ -29,7 +29,7 @@ public class ServerPlayerEntityMixin {
         for (int i = 0; i < player.getInventory().size(); i++) {
             ItemStack stack = player.getInventory().getStack(i);
             if (!stack.isEmpty() && EnchantmentUtil.hasEnchantment(
-                    ModEnchantments.SOULBOUND, stack, player.getWorld().getRegistryManager())) {
+                    ModEnchantments.SOULBOUND, stack, player.getRegistryManager())) {
                 saved.put(i, stack.copy());
                 player.getInventory().setStack(i, ItemStack.EMPTY);
             }
