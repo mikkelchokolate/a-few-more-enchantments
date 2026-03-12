@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "few_more_enchantments",
+  "version": "${version}",
+  "name": "A Few More Enchantments",
+  "description": "Adds several useful enchantments: Soulbound, Vein Mining, Lumberjack, Magnetism, Harvesting, Area Mining, and Depth Mine.",
+  "authors": [
+    "mikkelchokolate"
+  ],
+  "contact": {
+    "sources": "https://github.com/mikkelchokolate/a-few-more-enchantments",
+    "issues": "https://github.com/mikkelchokolate/a-few-more-enchantments/issues"
+  },
+
+  "license": "MIT",
+  "icon": "assets/few_more_enchantments/icon.png",
+
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "net.mikkelchokolate.fewmoreenchantments.FabricMain"
+    ]
+  },
+  "mixins": [
+    "few_more_enchantments.mixins.json"
+  ],
+
+  "depends": {
+    "fabricloader": ">=0.15.11",
+    "minecraft": ">=1.21",
+    "fabric-api": "*"
+  }
+}

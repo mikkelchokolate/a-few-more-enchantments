@@ -1,0 +1,11 @@
+{
+  "replace": false,
+  "values": [
+    "few_more_enchantments:vein_mining",
+    "few_more_enchantments:lumberjack",
+    "few_more_enchantments:magnetism",
+    "few_more_enchantments:harvesting",
+    "few_more_enchantments:area_mining",
+    "few_more_enchantments:depth_mine"
+  ]
+}
