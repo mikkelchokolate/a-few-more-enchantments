@@ -19,11 +19,13 @@ A Fabric mod that adds several useful enchantments to Minecraft.
 - Minecraft 1.21+
 - [Fabric Loader](https://fabricmc.net/) >= 0.15.11
 - [Fabric API](https://modrinth.com/mod/fabric-api)
+- [MCPitanLib](https://modrinth.com/mod/mcpitanlibarch)
 
 ## Installation
 
 1. Install Fabric Loader and Fabric API
-2. Place the mod JAR file in your `mods` folder
+2. Install MCPitanLib and Architecture API
+3. Place the mod JAR file in your `mods` folder
 
 ## Building
 
