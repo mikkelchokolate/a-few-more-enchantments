@@ -8,7 +8,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import net.mikkelchokolate.fewmoreenchantments.EnchantmentUtil;
 import net.mikkelchokolate.fewmoreenchantments.ModEnchantments;
 
 import java.util.HashSet;
@@ -21,14 +20,15 @@ public class DepthMineHandler {
     public static void register() {
         PlayerBlockBreakEvents.AFTER.register((world, player, pos, state, blockEntity) -> {
             if (world.isClient()) return;
-            if (!(player instanceof ServerPlayerEntity serverPlayer)) return;
+            if (!(player instanceof ServerPlayerEntity)) return;
+            ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
             if (PROCESSING.contains(pos)) return;
 
             ItemStack tool = player.getMainHandStack();
-            int areaLevel = EnchantmentUtil.getLevel(ModEnchantments.AREA_MINING, tool, world.getRegistryManager());
+            int areaLevel = ModEnchantments.getLevel(ModEnchantments.AREA_MINING_ID, tool, world);
             if (areaLevel > 0) return;
 
-            int level = EnchantmentUtil.getLevel(ModEnchantments.DEPTH_MINE, tool, world.getRegistryManager());
+            int level = ModEnchantments.getLevel(ModEnchantments.DEPTH_MINE_ID, tool, world);
             if (level <= 0) return;
 
             Direction facing = getMinedDirection(serverPlayer);

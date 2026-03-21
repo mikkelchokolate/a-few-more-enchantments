@@ -3,14 +3,13 @@ package net.mikkelchokolate.fewmoreenchantments.handler;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.registry.tag.BlockTags;
+import net.minecraft.tag.BlockTags;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.mikkelchokolate.fewmoreenchantments.EnchantmentUtil;
 import net.mikkelchokolate.fewmoreenchantments.ModEnchantments;
+import net.pitan76.mcpitanlib.api.util.ItemStackUtil;
 
 import java.util.ArrayDeque;
 import java.util.HashSet;
@@ -24,10 +23,11 @@ public class VeinMiningHandler {
     public static void register() {
         PlayerBlockBreakEvents.AFTER.register((world, player, pos, state, blockEntity) -> {
             if (world.isClient()) return;
-            if (!(player instanceof ServerPlayerEntity serverPlayer)) return;
+            if (!(player instanceof ServerPlayerEntity)) return;
+            ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
 
             ItemStack tool = player.getMainHandStack();
-            int level = EnchantmentUtil.getLevel(ModEnchantments.VEIN_MINING, tool, world.getRegistryManager());
+            int level = ModEnchantments.getLevel(ModEnchantments.VEIN_MINING_ID, tool, world);
             if (level <= 0) return;
 
             if (!isOre(state)) return;
@@ -42,7 +42,7 @@ public class VeinMiningHandler {
                 BlockState targetState = world.getBlockState(targetPos);
                 if (!targetState.isAir()) {
                     world.breakBlock(targetPos, true, player);
-                    tool.damage(1, serverPlayer, EquipmentSlot.MAINHAND);
+                    ItemStackUtil.damage(tool, 1, serverPlayer);
                 }
                 PROCESSING.remove(targetPos);
             }

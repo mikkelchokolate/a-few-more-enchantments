@@ -1,49 +1,49 @@
 package net.mikkelchokolate.fewmoreenchantments.handler;
 
-import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.CropBlock;
 import net.minecraft.item.ItemStack;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.BlockPos;
-import net.mikkelchokolate.fewmoreenchantments.EnchantmentUtil;
 import net.mikkelchokolate.fewmoreenchantments.ModEnchantments;
+import net.pitan76.mcpitanlib.api.event.result.EventResult;
+import net.pitan76.mcpitanlib.api.event.v0.InteractionEventRegistry;
 
 import java.util.List;
 
 public class HarvestingHandler {
 
     public static void register() {
-        UseBlockCallback.EVENT.register((player, world, hand, hitResult) -> {
-            if (world.isClient()) return ActionResult.PASS;
-            if (!(player instanceof ServerPlayerEntity serverPlayer)) return ActionResult.PASS;
+        InteractionEventRegistry.registerRightClickBlock(event -> {
+            if (event.getPlayer().isClient()) return EventResult.pass();
+            if (!event.getPlayer().isServerPlayer()) return EventResult.pass();
 
-            ItemStack tool = player.getStackInHand(hand);
-            int level = EnchantmentUtil.getLevel(ModEnchantments.HARVESTING, tool, world.getRegistryManager());
-            if (level <= 0) return ActionResult.PASS;
+            ItemStack tool = event.getStackInHand();
+            int level = ModEnchantments.getLevel(ModEnchantments.HARVESTING_ID, tool, event.getWorld());
+            if (level <= 0) return EventResult.pass();
 
-            BlockPos pos = hitResult.getBlockPos();
-            BlockState state = world.getBlockState(pos);
+            BlockPos pos = event.getPos();
+            BlockState state = event.getBlockState();
 
-            if (state.getBlock() instanceof CropBlock crop) {
+            if (state.getBlock() instanceof CropBlock) {
+                CropBlock crop = (CropBlock) state.getBlock();
                 if (crop.isMature(state)) {
-                    ServerWorld serverWorld = (ServerWorld) world;
+                    ServerWorld serverWorld = (ServerWorld) event.getWorld();
 
-                    List<ItemStack> drops = Block.getDroppedStacks(state, serverWorld, pos, null, player, tool);
+                    List<ItemStack> drops = Block.getDroppedStacks(state, serverWorld, pos, null,
+                            event.getPlayer().getPlayerEntity(), tool);
                     for (ItemStack drop : drops) {
-                        Block.dropStack(world, pos, drop);
+                        Block.dropStack(serverWorld, pos, drop);
                     }
 
-                    world.setBlockState(pos, crop.getDefaultState());
+                    serverWorld.setBlockState(pos, crop.getDefaultState());
 
-                    return ActionResult.SUCCESS;
+                    return EventResult.success();
                 }
             }
 
-            return ActionResult.PASS;
+            return EventResult.pass();
         });
     }
 }

@@ -7,7 +7,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
-import net.mikkelchokolate.fewmoreenchantments.EnchantmentUtil;
 import net.mikkelchokolate.fewmoreenchantments.ModEnchantments;
 
 import java.util.List;
@@ -37,7 +36,7 @@ public class MagnetismHandler {
         for (EquipmentSlot slot : ARMOR_SLOTS) {
             ItemStack armorStack = player.getEquippedStack(slot);
             if (armorStack.isEmpty()) continue;
-            int level = EnchantmentUtil.getLevel(ModEnchantments.MAGNETISM, armorStack, player.getRegistryManager());
+            int level = ModEnchantments.getLevel(ModEnchantments.MAGNETISM_ID, armorStack, player.getEntityWorld());
             if (level > maxLevel) {
                 maxLevel = level;
             }
@@ -63,7 +62,6 @@ public class MagnetismHandler {
             Vec3d direction = playerPos.subtract(new Vec3d(item.getX(), item.getY(), item.getZ())).normalize();
             double speed = 0.3;
             item.setVelocity(direction.multiply(speed));
-            item.velocityDirty = true;
         }
     }
 }

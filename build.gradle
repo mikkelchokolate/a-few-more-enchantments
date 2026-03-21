@@ -8,6 +8,8 @@ group = project.maven_group
 
 repositories {
     maven { url 'https://jitpack.io' }
+    maven { url "https://maven.pitan76.net/" }
+    maven { url "https://maven.architectury.dev/" }
 }
 
 dependencies {
@@ -17,6 +19,8 @@ dependencies {
 
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
+    modImplementation "net.pitan76:mcpitanlib-fabric${rootProject.mcpitanlib_version}"
+    include "net.pitan76:mcpitanlib_checker-fabric:${rootProject.mcpitanlib_checker_version}"
 }
 
 processResources {
@@ -28,10 +32,13 @@ processResources {
     }
 }
 
-def targetJavaVersion = 21
+def targetJavaVersion = 17
 tasks.withType(JavaCompile).configureEach {
     it.options.encoding = "UTF-8"
     it.options.release.set(targetJavaVersion)
+
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
 
 java {

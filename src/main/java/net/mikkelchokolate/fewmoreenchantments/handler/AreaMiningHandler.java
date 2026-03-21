@@ -8,7 +8,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import net.mikkelchokolate.fewmoreenchantments.EnchantmentUtil;
 import net.mikkelchokolate.fewmoreenchantments.ModEnchantments;
 
 import java.util.HashSet;
@@ -22,7 +21,8 @@ public class AreaMiningHandler {
     public static void register() {
         PlayerBlockBreakEvents.AFTER.register((world, player, pos, state, blockEntity) -> {
             if (world.isClient()) return;
-            if (!(player instanceof ServerPlayerEntity serverPlayer)) return;
+            if (!(player instanceof ServerPlayerEntity)) return;
+            ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
             if (PROCESSING.contains(pos)) return;
 
             ItemStack tool = player.getMainHandStack();
@@ -47,12 +47,11 @@ public class AreaMiningHandler {
     }
 
     private static int getAreaRadius(ItemStack tool, World world) {
-        int level = EnchantmentUtil.getLevel(ModEnchantments.AREA_MINING, tool, world.getRegistryManager());
-        return level;
+        return ModEnchantments.getLevel(ModEnchantments.AREA_MINING_ID, tool, world);
     }
 
     private static int getDepth(ItemStack tool, World world) {
-        return EnchantmentUtil.getLevel(ModEnchantments.DEPTH_MINE, tool, world.getRegistryManager());
+        return ModEnchantments.getLevel(ModEnchantments.DEPTH_MINE_ID, tool, world);
     }
 
     private static Direction getMinedFace(ServerPlayerEntity player) {
