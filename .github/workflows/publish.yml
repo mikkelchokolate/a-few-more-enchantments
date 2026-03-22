@@ -1,8 +1,15 @@
 name: Publish to Modrinth
 
 on:
-  release:
-    types: [published]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version (e.g. 1.0.3)'
+        required: true
+      changelog:
+        description: 'Changelog'
+        required: false
+        default: ''
 
 jobs:
   publish:
@@ -28,17 +35,14 @@ jobs:
       - name: Publish to Modrinth
         uses: Kir-Antipov/mc-publish@v3.3
         with:
-          # Set MODRINTH_ID in GitHub → Settings → Variables → Actions
           modrinth-id: ${{ vars.MODRINTH_ID }}
-          # Set MODRINTH_TOKEN in GitHub → Settings → Secrets → Actions
-          # Generate at: https://modrinth.com/settings/account (Scopes: CREATE_VERSION)
           modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
 
           files: build/libs/!(*-@(dev|sources|javadoc)).jar
 
-          name: ${{ github.event.release.name }}
-          version: ${{ github.event.release.tag_name }}
-          changelog: ${{ github.event.release.body }}
+          name: v${{ inputs.version }}
+          version: ${{ inputs.version }}
+          changelog: ${{ inputs.changelog }}
 
           game-versions: |
             >=1.18.2 <=1.21.11
