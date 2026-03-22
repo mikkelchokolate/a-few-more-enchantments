@@ -7,6 +7,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
+import net.pitan76.mcpitanlib.api.util.EntityUtil;
 import net.mikkelchokolate.fewmoreenchantments.ModEnchantments;
 
 import java.util.List;
@@ -36,7 +37,7 @@ public class MagnetismHandler {
         for (EquipmentSlot slot : ARMOR_SLOTS) {
             ItemStack armorStack = player.getEquippedStack(slot);
             if (armorStack.isEmpty()) continue;
-            int level = ModEnchantments.getLevel(ModEnchantments.MAGNETISM_ID, armorStack, player.getEntityWorld());
+            int level = ModEnchantments.getLevel(ModEnchantments.MAGNETISM_ID, armorStack, EntityUtil.getWorld(player));
             if (level > maxLevel) {
                 maxLevel = level;
             }
@@ -50,7 +51,7 @@ public class MagnetismHandler {
                 player.getX() + radius, player.getY() + radius, player.getZ() + radius
         );
 
-        List<ItemEntity> items = player.getEntityWorld().getEntitiesByClass(ItemEntity.class, box, item -> {
+        List<ItemEntity> items = EntityUtil.getWorld(player).getEntitiesByClass(ItemEntity.class, box, item -> {
             if (item.isRemoved()) return false;
             if (item.cannotPickup()) return false;
             return item.squaredDistanceTo(player) <= radius * radius;

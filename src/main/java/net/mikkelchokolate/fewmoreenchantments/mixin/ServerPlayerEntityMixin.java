@@ -4,6 +4,7 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.mikkelchokolate.fewmoreenchantments.ModEnchantments;
+import net.pitan76.mcpitanlib.api.util.EntityUtil;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -28,7 +29,7 @@ public class ServerPlayerEntityMixin {
         for (int i = 0; i < player.getInventory().size(); i++) {
             ItemStack stack = player.getInventory().getStack(i);
             if (!stack.isEmpty() && ModEnchantments.hasEnchantment(
-                    ModEnchantments.SOULBOUND_ID, stack, player.getEntityWorld())) {
+                    ModEnchantments.SOULBOUND_ID, stack, EntityUtil.getWorld(player))) {
                 saved.put(i, stack.copy());
                 player.getInventory().setStack(i, ItemStack.EMPTY);
             }
